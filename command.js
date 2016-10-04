@@ -26,7 +26,7 @@ var argv = require('optimist')
     .default('camelCaseProperties', false)
     .string('t')
     .alias('t', 'templateDir')
-    .default('t', __dirname."/templates/")
+    .default('t', __dirname+"/templates/")
     .argv;
 // Import in typescript and commondjs style
 //var ProtoBuf = require("protobufjs");
