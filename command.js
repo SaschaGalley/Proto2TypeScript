@@ -26,12 +26,13 @@ var argv = require('optimist')
     .default('camelCaseProperties', false)
     .string('t')
     .alias('t', 'templateDir')
-    .default('t', __dirname)
+    .default('t', __dirname."/templates/")
     .argv;
 // Import in typescript and commondjs style
 //var ProtoBuf = require("protobufjs");
 var DustJS = require("dustjs-helpers");
 var fs = require("fs");
+var path = require("path");
 // Keep line breaks
 DustJS.optimizers.format = function (ctx, node) { return node; };
 // Create view filters
@@ -73,7 +74,7 @@ DustJS.filters["convertType"] = function (value) {
 DustJS.filters["optionalFieldDeclaration"] = function (value) { return value == "optional" ? "?" : ""; };
 DustJS.filters["repeatedType"] = function (value) { return value == "repeated" ? "[]" : ""; };
 function loadDustTemplate(name) {
-    var template = fs.readFileSync(argv.templateDir + "/templates/" + name + ".dust", "UTF8").toString(), compiledTemplate = DustJS.compile(template, name);
+    var template = fs.readFileSync(path.join(argv.templateDir, name+".dust"), "UTF8").toString(), compiledTemplate = DustJS.compile(template, name);
     DustJS.loadSource(compiledTemplate);
 }
 // Generate the names for the model, the types, and the interfaces

@@ -36,6 +36,7 @@ var argv = require('optimist')
 //var ProtoBuf = require("protobufjs");
 import DustJS = require("dustjs-helpers");
 import fs = require("fs");
+import path = require("path");
 
 // Keep line breaks
 DustJS.optimizers.format = (ctx, node)=> node;
@@ -88,7 +89,7 @@ DustJS.filters["repeatedType"] = (value : string)=> value == "repeated" ? "[]" :
 
 
 function loadDustTemplate(name : string) : void {
-	var template = fs.readFileSync(argv.templateDir+"/templates/"+name+".dust", "UTF8").toString(),
+	var template = fs.readFileSync(path.join(argv.templateDir, name+".dust"), "UTF8").toString(),
 		compiledTemplate = DustJS.compile(template, name);
 
 	DustJS.loadSource(compiledTemplate);
