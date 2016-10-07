@@ -27,12 +27,21 @@ var argv = require('optimist')
     .string('t')
     .alias('t', 'templateDir')
     .default('t', __dirname+"/templates/")
+    .boolean('prependTypePackage')
+    .describe('prependTypePackage', 'Prepend')
+    .default('prependTypePackage', false)
     .argv;
 // Import in typescript and commondjs style
 //var ProtoBuf = require("protobufjs");
 var DustJS = require("dustjs-helpers");
 var fs = require("fs");
 var path = require("path");
+// Load the json file
+var model = JSON.parse(fs.readFileSync(argv.file).toString());
+// If a packagename isn't present, use a default package name
+if (!model.package) {
+  model.package = "Proto2TypeScript";
+}
 // Keep line breaks
 DustJS.optimizers.format = function (ctx, node) { return node; };
 // Create view filters
@@ -69,7 +78,7 @@ DustJS.filters["convertType"] = function (value) {
             return "Long";
     }
     // By default, it's a message identifier
-    return value;
+    return argv.prependTypePackage ? model.package + '.' + value : value;
 };
 DustJS.filters["optionalFieldDeclaration"] = function (value) { return value == "optional" ? "?" : ""; };
 DustJS.filters["repeatedType"] = function (value) { return value == "repeated" ? "[]" : ""; };
@@ -127,12 +136,6 @@ loadDustTemplate("module");
 loadDustTemplate("interface");
 loadDustTemplate("enum");
 loadDustTemplate("builder");
-// Load the json file
-var model = JSON.parse(fs.readFileSync(argv.file).toString());
-// If a packagename isn't present, use a default package name
-if (!model.package) {
-    model.package = "Proto2TypeScript";
-}
 // Generates the names of the model
 generateNames(model, model.package);
 // Render the model

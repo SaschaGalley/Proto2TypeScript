@@ -29,6 +29,9 @@ var argv = require('optimist')
     .string('t')
     .alias('t', 'templateDir')
     .default('t', __dirname)
+    .boolean('prependTypePackage')
+    .describe('prependTypePackage', 'Prepend')
+    .default('prependTypePackage', false)
     .argv;
 
 
@@ -37,6 +40,14 @@ var argv = require('optimist')
 import DustJS = require("dustjs-helpers");
 import fs = require("fs");
 import path = require("path");
+
+// Load the json file
+var	model = JSON.parse(fs.readFileSync(argv.file).toString());
+
+// If a packagename isn't present, use a default package name
+if (!model.package) {
+  model.package = "Proto2TypeScript";
+}
 
 // Keep line breaks
 DustJS.optimizers.format = (ctx, node)=> node;
@@ -80,7 +91,7 @@ DustJS.filters["convertType"] = (value : string)=> {
 	}
 
 	// By default, it's a message identifier
-	return value;
+	return argv.prependTypePackage ? model.package + '.' + value : value;
 };
 
 DustJS.filters["optionalFieldDeclaration"] = (value : string)=> value == "optional" ? "?" : "";
@@ -156,14 +167,6 @@ loadDustTemplate("module");
 loadDustTemplate("interface");
 loadDustTemplate("enum");
 loadDustTemplate("builder");
-
-// Load the json file
-var	model = JSON.parse(fs.readFileSync(argv.file).toString());
-
-// If a packagename isn't present, use a default package name
-if (!model.package) {
-	model.package = "Proto2TypeScript";
-}
 
 // Generates the names of the model
 generateNames(model, model.package);
