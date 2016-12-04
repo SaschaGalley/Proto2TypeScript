@@ -73,7 +73,7 @@ DustJS.filters["convertType"] = (value : string)=> {
 	case 'bool':
 		return 'boolean';
 	case 'bytes':
-		return 'ByteBuffer';
+		return 'string';
 	case 'double':
 	case 'float':
 	case 'int32':
